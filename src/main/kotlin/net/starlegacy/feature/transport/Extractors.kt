@@ -23,6 +23,8 @@ import net.starlegacy.util.randomEntry
 import net.starlegacy.util.randomFloat
 import net.starlegacy.util.timing
 import net.starlegacy.util.ungzip
+import org.bukkit.Bukkit
+import org.bukkit.Bukkit.shutdown
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -30,7 +32,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockState
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.DaylightDetector
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventory
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventory
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
@@ -108,8 +110,9 @@ object Extractors : SLComponent() {
 				Gson().fromJson(ungzip(Files.readAllBytes(file.toPath())), WorldDataStorage::class.java)
 			} catch (e: Exception) {
 				e.printStackTrace()
-				file.delete()
-				return loadExtractors(world)
+				log.error("Failed to load extractors, to be safe, the server will now shutdown to prevent loss of data, please correct the issue if possible.")
+				shutdown()
+				return
 			}
 		} else {
 			WorldDataStorage(listOf())
@@ -167,10 +170,10 @@ object Extractors : SLComponent() {
 				continue
 			}
 
-			val computers: MutableList<Vec3i> = mutableListOf() // list of note block power machine computers
-			val wires: MutableList<BlockFace> = mutableListOf() // list of end rod wires
-			val inventories: MutableList<Vec3i> = mutableListOf() // list of inventories to extract from to pipes
-			val pipes: MutableList<BlockFace> = mutableListOf() // list of pipes to extract to
+			val computers: MutableSet<Vec3i> = mutableSetOf() // list of note block power machine computers
+			val wires: MutableSet<BlockFace> = mutableSetOf() // list of end rod wires
+			val inventories: MutableSet<Vec3i> = mutableSetOf() // list of inventories to extract from to pipes
+			val pipes: MutableSet<BlockFace> = mutableSetOf() // list of pipes to extract to
 
 			var solarSensor: BlockData? = null
 
@@ -237,7 +240,7 @@ object Extractors : SLComponent() {
 	// TODO: Make this mostly async
 	private fun handlePipe(
 		world: World, extractorLocation: Vec3i,
-		inventoryLocations: List<Vec3i>, pipeLocations: List<BlockFace>
+		inventoryLocations: Set<Vec3i>, pipeLocations: Set<BlockFace>
 	): Unit = Tasks.syncTimed(pipeTiming) {
 		var cancelled = true
 
@@ -300,7 +303,7 @@ object Extractors : SLComponent() {
 		return nms.contents.any { it != null && !it.isEmpty }
 	}
 
-	private fun handleWire(world: World, x: Int, y: Int, z: Int, computers: List<Vec3i>, wires: List<BlockFace>) {
+	private fun handleWire(world: World, x: Int, y: Int, z: Int, computers: Set<Vec3i>, wires: Set<BlockFace>) {
 		val wire: BlockFace = wires.randomEntry()
 		val computer: Vec3i = computers.randomEntry()
 
@@ -309,7 +312,7 @@ object Extractors : SLComponent() {
 
 	private const val SOLAR_PANEL_CHANCE = 0.05
 
-	private fun handleSolarPanel(world: World, x: Int, y: Int, z: Int, wires: List<BlockFace>, sensor: BlockData) {
+	private fun handleSolarPanel(world: World, x: Int, y: Int, z: Int, wires: Set<BlockFace>, sensor: BlockData) {
 		if (wires.isEmpty()) {
 			return
 		}

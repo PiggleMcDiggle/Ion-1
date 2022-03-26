@@ -55,7 +55,7 @@ import org.litote.kmongo.updateOneById
 @CommandAlias("settlement|s")
 internal object SettlementCommand : SLCommand() {
 	private fun validateName(name: String, settlementId: Oid<Settlement>?) {
-		if (!name.isAlphanumeric()) {
+		if (!"\\w*".toRegex().matches(name)) { 
 			throw InvalidCommandArgument("Name must be alphanumeric")
 		}
 
@@ -77,6 +77,8 @@ internal object SettlementCommand : SLCommand() {
 	@Description("Create your own settlement in the territory you're in (More expensive for bigger territories)")
 	fun onCreate(sender: Player, name: String, @Optional cost: Int?): Unit = asyncCommand(sender) {
 		requireNotInSettlement(sender)
+
+		requireMinLevel(sender, NATIONS_BALANCE.settlement.minCreateLevel)
 
 		validateName(name, null)
 

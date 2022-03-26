@@ -1,6 +1,7 @@
 package net.starlegacy.feature.starship
 
 import java.util.Locale
+import net.starlegacy.feature.progression.Levels
 import net.starlegacy.util.setDisplayNameAndGet
 import net.starlegacy.util.setLoreAndGet
 import org.bukkit.Material
@@ -19,7 +20,8 @@ enum class StarshipType(
 	val interdictionRange: Int,
 	val hyperspaceRangeMultiplier: Double,
 	menuItemMaterial: Material,
-	val isWarship: Boolean
+	val isWarship: Boolean,
+	val colour: String
 ) {
 	SPEEDER(
 		displayName = "Speeder",
@@ -33,21 +35,8 @@ enum class StarshipType(
 		interdictionRange = 10,
 		hyperspaceRangeMultiplier = 3.0,
 		menuItemMaterial = Material.DEAD_BUSH,
-		isWarship = false
-	),
-	SPACE_STATION(
-		displayName = "Space Station",
-		minSize = 48000,
-		maxSize = 500000,
-		minLevel = 100,
-		containerPercent = 0.05,
-		crateLimitMultiplier = 0.01,
-		sneakFlyAccelDistance = 0,
-		maxSneakFlyAccel = 0,
-		interdictionRange = 10,
-		hyperspaceRangeMultiplier = 1.0,
-		menuItemMaterial = Material.DIAMOND,
-		isWarship = false
+		isWarship = false,
+		colour = "#007100"
 	),
 	STARFIGHTER(
 		displayName = "Starfighter",
@@ -61,7 +50,8 @@ enum class StarshipType(
 		interdictionRange = 400,
 		hyperspaceRangeMultiplier = 2.0,
 		menuItemMaterial = Material.IRON_NUGGET,
-		isWarship = true
+		isWarship = true,
+		colour = "#330000"
 	),
 	GUNSHIP(
 		displayName = "Gunship",
@@ -75,7 +65,8 @@ enum class StarshipType(
 		interdictionRange = 800,
 		hyperspaceRangeMultiplier = 2.1,
 		menuItemMaterial = Material.IRON_INGOT,
-		isWarship = true
+		isWarship = true,
+		colour = "#660000"
 	),
 	CORVETTE(
 		displayName = "Corvette",
@@ -89,7 +80,8 @@ enum class StarshipType(
 		interdictionRange = 1200,
 		hyperspaceRangeMultiplier = 2.2,
 		menuItemMaterial = Material.IRON_BLOCK,
-		isWarship = true
+		isWarship = true,
+		colour = "#990000"
 	),
 	FRIGATE(
 		displayName = "Frigate",
@@ -103,7 +95,8 @@ enum class StarshipType(
 		interdictionRange = 1600,
 		hyperspaceRangeMultiplier = 2.3,
 		menuItemMaterial = Material.LAPIS_BLOCK,
-		isWarship = true
+		isWarship = true,
+		colour = "#cc0000"
 	),
 	DESTROYER(
 		displayName = "Destroyer",
@@ -117,65 +110,9 @@ enum class StarshipType(
 		interdictionRange = 2000,
 		hyperspaceRangeMultiplier = 2.4,
 		menuItemMaterial = Material.GOLD_BLOCK,
-		isWarship = true
+		isWarship = true,
+		colour = "#ff0000"
 	),
-	INTERDICTOR(
-		displayName = "Interdictor",
-		minSize = 14000,
-		maxSize = 22000,
-		minLevel = 50,
-		containerPercent = 0.015,
-		crateLimitMultiplier = 0.25,
-		sneakFlyAccelDistance = 1,
-		maxSneakFlyAccel = 1,
-		interdictionRange = 4000,
-		hyperspaceRangeMultiplier = 3.0,
-		menuItemMaterial = Material.PURPLE_DYE,
-		isWarship = true
-	),
-	BATTLECRUISER(
-		displayName = "Battlecruiser",
-		minSize = 12000,
-		maxSize = 20000,
-		minLevel = 60,
-		containerPercent = 0.025,
-		crateLimitMultiplier = 0.5,
-		sneakFlyAccelDistance = 5,
-		maxSneakFlyAccel = 5,
-		interdictionRange = 2400,
-		hyperspaceRangeMultiplier = 2.5,
-		menuItemMaterial = Material.DIAMOND_BLOCK,
-		isWarship = true
-	),
-	BATTLESHIP(
-		displayName = "Battleship",
-		minSize = 20000,
-		maxSize = 32000,
-		minLevel = 72,
-		containerPercent = 0.025,
-		crateLimitMultiplier = 0.5,
-		sneakFlyAccelDistance = 5,
-		maxSneakFlyAccel = 3,
-		interdictionRange = 2800,
-		hyperspaceRangeMultiplier = 2.6,
-		menuItemMaterial = Material.MAGMA_BLOCK,
-		isWarship = true
-	),
-	DREADNOUGHT(
-		displayName = "Dreadnought",
-		minSize = 32000,
-		maxSize = 48000,
-		minLevel = 84,
-		containerPercent = 0.025,
-		crateLimitMultiplier = 0.5,
-		sneakFlyAccelDistance = 10,
-		maxSneakFlyAccel = 2,
-		interdictionRange = 3200,
-		hyperspaceRangeMultiplier = 2.7,
-		menuItemMaterial = Material.EMERALD_BLOCK,
-		isWarship = true
-	),
-
 	SHUTTLE(
 		displayName = "Shuttle",
 		minSize = 100,
@@ -188,7 +125,8 @@ enum class StarshipType(
 		interdictionRange = 300,
 		hyperspaceRangeMultiplier = 1.0,
 		menuItemMaterial = Material.PRISMARINE_SHARD,
-		isWarship = false
+		isWarship = false,
+		colour = "#000033"
 	),
 	TRANSPORT(
 		displayName = "Transport",
@@ -202,7 +140,8 @@ enum class StarshipType(
 		interdictionRange = 600,
 		hyperspaceRangeMultiplier = 1.1,
 		menuItemMaterial = Material.PRISMARINE_CRYSTALS,
-		isWarship = false
+		isWarship = false,
+		colour = "#000066"
 	),
 	LIGHT_FREIGHTER(
 		displayName = "Light Freighter",
@@ -216,7 +155,8 @@ enum class StarshipType(
 		interdictionRange = 900,
 		hyperspaceRangeMultiplier = 1.2,
 		menuItemMaterial = Material.PRISMARINE_SLAB,
-		isWarship = false
+		isWarship = false,
+		colour = "#000099"
 	),
 	MEDIUM_FREIGHTER(
 		displayName = "Medium Freighter",
@@ -230,10 +170,11 @@ enum class StarshipType(
 		interdictionRange = 1200,
 		hyperspaceRangeMultiplier = 1.3,
 		menuItemMaterial = Material.PRISMARINE_STAIRS,
-		isWarship = false
+		isWarship = false,
+		colour = "#0000cc"
 	),
-	BULK_FREIGHTER(
-		displayName = "Bulk Freighter",
+	HEAVY_FREIGHTER(
+		displayName = "Heavy Freighter",
 		minSize = 8000,
 		maxSize = 12000,
 		minLevel = 48,
@@ -244,51 +185,11 @@ enum class StarshipType(
 		interdictionRange = 1500,
 		hyperspaceRangeMultiplier = 1.4,
 		menuItemMaterial = Material.PRISMARINE,
-		isWarship = false
-	),
-	HEAVY_FREIGHTER(
-		displayName = "Heavy Freighter",
-		minSize = 12000,
-		maxSize = 20000,
-		minLevel = 60,
-		containerPercent = 0.045,
-		crateLimitMultiplier = 1.0,
-		sneakFlyAccelDistance = 10,
-		maxSneakFlyAccel = 3,
-		interdictionRange = 1800,
-		hyperspaceRangeMultiplier = 1.5,
-		menuItemMaterial = Material.PRISMARINE_BRICKS,
-		isWarship = false
-	),
-	BARGE(
-		displayName = "Barge",
-		minSize = 20000,
-		maxSize = 32000,
-		minLevel = 72,
-		containerPercent = 0.045,
-		crateLimitMultiplier = 1.0,
-		sneakFlyAccelDistance = 10,
-		maxSneakFlyAccel = 3,
-		interdictionRange = 2100,
-		hyperspaceRangeMultiplier = 1.6,
-		menuItemMaterial = Material.DARK_PRISMARINE,
-		isWarship = false
-	),
-	TANKER(
-		displayName = "Tanker",
-		minSize = 32000,
-		maxSize = 48000,
-		minLevel = 84,
-		containerPercent = 0.045,
-		crateLimitMultiplier = 1.0,
-		sneakFlyAccelDistance = 10,
-		maxSneakFlyAccel = 3,
-		interdictionRange = 2400,
-		hyperspaceRangeMultiplier = 1.7,
-		menuItemMaterial = Material.GLOWSTONE,
-		isWarship = false
+		isWarship = false,
+		colour = "#0000ff"
 	);
 
+	val formatted: String get() = "<$colour>$displayName</$colour>"
 
 	val menuItem: ItemStack = ItemStack(menuItemMaterial)
 		.setDisplayNameAndGet(displayName)
@@ -308,7 +209,7 @@ enum class StarshipType(
 		)
 
 	fun canUse(player: Player): Boolean =
-		player.hasPermission("starships.anyship")
+		player.hasPermission("starships.anyship") || Levels[player] >= minLevel
 
 	companion object {
 		private val stringMap = mutableMapOf<String, StarshipType>().apply {

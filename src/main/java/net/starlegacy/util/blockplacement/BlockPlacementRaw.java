@@ -16,7 +16,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_18_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ class BlockPlacementRaw {
     @NotNull
     private static BlockState[][][] emptyChunkMap() {
         // y x z array
-		BlockState[][][] array = new BlockState[256][][];
+		BlockState[][][] array = new BlockState[Bukkit.getWorlds().get(0).getMaxHeight() - Bukkit.getWorlds().get(0).getMinHeight()][][];
 
         for (int y1 = 0; y1 < array.length; y1++) {
 			BlockState[][] xArray = new BlockState[16][];
@@ -110,33 +110,29 @@ class BlockPlacementRaw {
             long chunkKey = entry.getKey();
 			BlockState[][][] blocks = entry.getValue();
 
-            actuallyPlaceChunk(world, onComplete, start, placedChunks, placed, chunkCount, chunkKey, blocks, immediate);
+//          actuallyPlaceChunk(world, onComplete, start, placedChunks, placed, chunkCount, chunkKey, blocks, immediate);
+
+			// Actually Place Chunk
+			int cx = chunkKeyX(chunkKey);
+			int cz = chunkKeyZ(chunkKey);
+
+			boolean isLoaded = world.isChunkLoaded(cx, cz);
+
+			if (!isLoaded && !immediate) {
+				world.getChunkAtAsync(cx, cz).thenAccept(chunk -> {
+					actuallyPlaceChunk(world, onComplete, start, placedChunks, placed, chunkCount, blocks, cx, cz, false, chunk);
+				});
+				return;
+			}
+
+			org.bukkit.Chunk chunk = world.getChunkAt(cx, cz);
+			actuallyPlaceChunk(world, onComplete, start, placedChunks, placed, chunkCount, blocks, cx, cz, isLoaded, chunk);
         }
 
         if (worldQueues.remove(world, worldQueue)) {
             worldQueue.clear();
         }
     }
-
-    private void actuallyPlaceChunk(World world, @Nullable Consumer<World> onComplete, long start, AtomicInteger placedChunks,
-                                    AtomicInteger placed, int chunkCount, long chunkKey, BlockState[][][] blocks, boolean immediate) {
-        int cx = chunkKeyX(chunkKey);
-        int cz = chunkKeyZ(chunkKey);
-
-        boolean isLoaded = world.isChunkLoaded(cx, cz);
-
-        if (!isLoaded && !immediate) {
-            world.getChunkAtAsync(cx, cz).thenAccept(chunk -> {
-                actuallyPlaceChunk(world, onComplete, start, placedChunks, placed, chunkCount, blocks, cx, cz, false, chunk);
-            });
-            return;
-        }
-
-        org.bukkit.Chunk chunk = world.getChunkAt(cx, cz);
-        actuallyPlaceChunk(world, onComplete, start, placedChunks, placed, chunkCount, blocks, cx, cz, isLoaded, chunk);
-    }
-
-    private static final boolean ignoreOldData = true; // if false, client will recalculate lighting based on old/new chunk data
 
     private void updateHeightMap(@Nullable Heightmap heightMap, int x, int y, int z, BlockState iBlockData) {
         if (heightMap != null) {
@@ -166,14 +162,14 @@ class BlockPlacementRaw {
         for (int y = 0; y < blocks.length; y++) {
             int sectionY = y >> 4;
 
-//            if (section == null || sectionY != section.getYPosition()) {
-//                section = sections[sectionY];
-//
+            if (section == null || sectionY != section.bottomBlockY()) {
+                section = sections[sectionY];
+
 //                if (section == null) {
 //                    section = new LevelChunkSection(sectionY << 4, nmsChunk, nmsWorld, true);
 //                    sections[sectionY] = section;
 //                }
-//            }
+            }
 
 			BlockState[][] xBlocks = blocks[y];
 
@@ -206,8 +202,22 @@ class BlockPlacementRaw {
             bitmask = bitmask | (1 << sectionY); // update the bitmask to include this section
         }
 
-        relight(world, cx, cz, nmsWorld);
-        sendChunkPacket(nmsChunk, bitmask);
+//        relight(world, cx, cz, nmsWorld);
+
+		// Relight
+		LevelLightEngine lightEngine = nmsWorld.getLightEngine();
+		lightEngine.retainData(new ChunkPos(cx, cz), world.getEnvironment() == World.Environment.NORMAL);
+
+//        sendChunkPacket(nmsChunk, bitmask);
+
+		// Send Chunk Packet
+		ChunkHolder playerChunk = nmsChunk.playerChunk;
+		if (playerChunk == null) {
+			return;
+		}
+
+		ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(nmsChunk, nmsChunk.level.getLightEngine(), null, new BitSet(bitmask), false, true);
+		playerChunk.broadcast(packet, false);
 
         nmsChunk.setUnsaved(true);
 
@@ -229,20 +239,5 @@ class BlockPlacementRaw {
         } else {
             log.debug("Placed " + placedNow + " blocks and " + placedChunksNow + "/" + chunkCount + " chunks ");
         }
-    }
-
-    private void relight(World world, int cx, int cz, Level nmsWorld) {
-		LevelLightEngine lightEngine = nmsWorld.getLightEngine();
-        lightEngine.retainData(new ChunkPos(cx, cz), world.getEnvironment() == World.Environment.NORMAL);
-    }
-
-    private void sendChunkPacket(LevelChunk nmsChunk, int bitmask) {
-		ChunkHolder playerChunk = nmsChunk.playerChunk;
-        if (playerChunk == null) {
-            return;
-        }
-
-		ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(nmsChunk, nmsChunk.level.getLightEngine(), null, new BitSet(bitmask), false, true);
-        playerChunk.broadcast(packet, false);
     }
 }

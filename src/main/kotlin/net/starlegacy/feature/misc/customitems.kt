@@ -238,7 +238,7 @@ object CustomItems {
 		model: Int
 	) : CustomItem(id, displayName, material, model, true)
 
-	val POWER_MODULE_SHOCK_ABSORBING = registerModule("shock_absorbing", "Shock Absorbing", 1)
+//	val POWER_MODULE_SHOCK_ABSORBING = registerModule("shock_absorbing", "Shock Absorbing", 1)
 	val POWER_MODULE_SPEED_BOOSTING = registerModule("speed_boosting", "Speed Boosting", 2)
 	val POWER_MODULE_ROCKET_BOOSTING = registerModule("rocket_boosting", "Rocket Boosting", 3)
 	val POWER_MODULE_NIGHT_VISION = registerModule("night_vision", "Night Vision", 4)
@@ -294,12 +294,10 @@ object CustomItems {
 		)
 	}
 
-	val MINERAL_COPPER = registerMineral(type = "copper", typeName = "Copper", model = 1)
-	val MINERAL_ALUMINUM = registerMineral(type = "aluminum", typeName = "Aluminum", model = 2)
-	val MINERAL_CHETHERITE = registerMineral(type = "chetherite", typeName = "Chetherite", model = 3)
-	val MINERAL_TITANIUM = registerMineral(type = "titanium", typeName = "Titanium", model = 4)
-	val MINERAL_URANIUM = registerMineral(type = "uranium", typeName = "Uranium", model = 5)
-	val MINERAL_ORIOMIUM = registerMineral("oriomium", "Oriomium", 6)
+	val MINERAL_ALUMINUM = registerMineral(type = "aluminum", typeName = "Aluminum", model = 1)
+	val MINERAL_CHETHERITE = registerMineral(type = "chetherite", typeName = "Chetherite", model = 2)
+	val MINERAL_TITANIUM = registerMineral(type = "titanium", typeName = "Titanium", model = 3)
+	val MINERAL_URANIUM = registerMineral(type = "uranium", typeName = "Uranium", model = 4)
 	//endregion Minerals
 
 	//region Planet Icons
@@ -310,21 +308,21 @@ object CustomItems {
 		model = model
 	)
 
-	val PLANET_ICON_AECOR = registerPlanetIcon("Aecor", 1)
-	val PLANET_ICON_ARBUSTO = registerPlanetIcon("Arbusto", 2)
-	val PLANET_ICON_CERUS_ALPHA = registerPlanetIcon("Cerus Alpha", 3)
-	val PLANET_ICON_CERUS_BETA = registerPlanetIcon("Cerus Beta", 4)
-	val PLANET_ICON_COLLIS = registerPlanetIcon("Collis", 5)
-	val PLANET_ICON_HARENUM = registerPlanetIcon("Harenum", 6)
-	val PLANET_ICON_KORYZA = registerPlanetIcon("Koryza", 7)
-	val PLANET_ICON_ORCUS = registerPlanetIcon("Orcus", 8)
-	val PLANET_ICON_PORRUS = registerPlanetIcon("Porrus", 9)
-	val PLANET_ICON_QUOD_CANIS = registerPlanetIcon("Quod Canis", 10)
-	val PLANET_ICON_SAKARO = registerPlanetIcon("Sakaro", 11)
-	val PLANET_ICON_SYRE = registerPlanetIcon("Syre", 12)
-	val PLANET_ICON_TERRAM = registerPlanetIcon("Terram", 13)
-	val PLANET_ICON_TITUS = registerPlanetIcon("Titus", 14)
-	val PLANET_ICON_TRUNKADIS = registerPlanetIcon("Trunkadis", 15)
+//	val PLANET_ICON_AECOR = registerPlanetIcon("Aecor", 1)
+//	val PLANET_ICON_ARBUSTO = registerPlanetIcon("Arbusto", 2)
+//	val PLANET_ICON_CERUS_ALPHA = registerPlanetIcon("Cerus Alpha", 3)
+//	val PLANET_ICON_CERUS_BETA = registerPlanetIcon("Cerus Beta", 4)
+//	val PLANET_ICON_COLLIS = registerPlanetIcon("Collis", 5)
+//	val PLANET_ICON_HARENUM = registerPlanetIcon("Harenum", 6)
+//	val PLANET_ICON_KORYZA = registerPlanetIcon("Koryza", 7)
+//	val PLANET_ICON_ORCUS = registerPlanetIcon("Orcus", 8)
+//	val PLANET_ICON_PORRUS = registerPlanetIcon("Porrus", 9)
+//	val PLANET_ICON_QUOD_CANIS = registerPlanetIcon("Quod Canis", 10)
+//	val PLANET_ICON_SAKARO = registerPlanetIcon("Sakaro", 11)
+//	val PLANET_ICON_SYRE = registerPlanetIcon("Syre", 12)
+//	val PLANET_ICON_TERRAM = registerPlanetIcon("Terram", 13)
+//	val PLANET_ICON_TITUS = registerPlanetIcon("Titus", 14)
+//	val PLANET_ICON_TRUNKADIS = registerPlanetIcon("Trunkadis", 15)
 	//endregion
 
 	//region Rockets

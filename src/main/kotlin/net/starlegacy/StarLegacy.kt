@@ -6,6 +6,7 @@ import co.aikar.commands.InvalidCommandArgument
 import co.aikar.commands.PaperCommandManager
 import java.io.File
 import java.util.Locale
+import net.horizonsend.ion.core.commands.Starships
 import net.starlegacy.cache.Caches
 import net.starlegacy.cache.nations.NationCache
 import net.starlegacy.cache.nations.PlayerCache
@@ -45,12 +46,13 @@ import net.starlegacy.command.nations.roles.SettlementRoleCommand
 import net.starlegacy.command.nations.settlementZones.SettlementPlotCommand
 import net.starlegacy.command.nations.settlementZones.SettlementZoneCommand
 import net.starlegacy.command.progression.AdvanceAdminCommand
-import net.starlegacy.command.progression.AdvanceCommand
+import net.starlegacy.command.progression.BuyXPCommand
+import net.starlegacy.command.progression.GiveXPCommand
+import net.starlegacy.command.progression.XPCommand
 import net.starlegacy.command.space.PlanetCommand
 import net.starlegacy.command.space.SpaceWorldCommand
 import net.starlegacy.command.space.StarCommand
 import net.starlegacy.command.starship.BlueprintCommand
-import net.starlegacy.command.starship.HyperspaceBeaconCommand
 import net.starlegacy.command.starship.MiscStarshipCommands
 import net.starlegacy.command.starship.StarshipDebugCommand
 import net.starlegacy.command.starship.StarshipInfoCommand
@@ -101,8 +103,11 @@ import net.starlegacy.feature.nations.StationSieges
 import net.starlegacy.feature.nations.region.Regions
 import net.starlegacy.feature.nations.region.types.RegionSettlementZone
 import net.starlegacy.feature.nations.region.types.RegionTerritory
-import net.starlegacy.feature.progression.advancement.Advancements
-import net.starlegacy.feature.progression.advancement.SLAdvancement
+import net.starlegacy.feature.progression.Levels
+import net.starlegacy.feature.progression.MAX_LEVEL
+import net.starlegacy.feature.progression.PlayerXPLevelCache
+import net.starlegacy.feature.progression.SLXP
+import net.starlegacy.feature.progression.ShipKillXP
 import net.starlegacy.feature.space.CachedPlanet
 import net.starlegacy.feature.space.CachedStar
 import net.starlegacy.feature.space.Orbits
@@ -124,7 +129,6 @@ import net.starlegacy.feature.starship.control.StarshipControl
 import net.starlegacy.feature.starship.control.StarshipCruising
 import net.starlegacy.feature.starship.factory.StarshipFactories
 import net.starlegacy.feature.starship.hyperspace.Hyperspace
-import net.starlegacy.feature.starship.hyperspace.HyperspaceBeacons
 import net.starlegacy.feature.starship.subsystem.shield.StarshipShields
 import net.starlegacy.feature.transport.Extractors
 import net.starlegacy.feature.transport.TransportConfig
@@ -200,7 +204,9 @@ class StarLegacy : JavaPlugin() {
 			Notify,
 			Shuttles,
 
-			Advancements,
+			PlayerXPLevelCache,
+			Levels,
+			SLXP,
 
 			ChannelSelections,
 			ChatChannel.ChannelActions,
@@ -256,6 +262,7 @@ class StarLegacy : JavaPlugin() {
 
 			PlanetSpawns,
 
+			Hyperspace,
 			DeactivatedPlayerStarships,
 			ActiveStarships,
 			ActiveStarshipMechanics,
@@ -267,13 +274,12 @@ class StarLegacy : JavaPlugin() {
 			StarshipCruising,
 			ContactsDisplay,
 			Hangars,
-			Hyperspace,
-			HyperspaceBeacons,
 			Turrets,
 			StarshipFactories,
 			TutorialManager,
 			Interdiction,
 			StarshipDealers,
+			ShipKillXP,
 			Decomposers,
 
 			DutyModeMonitor
@@ -363,6 +369,7 @@ class StarLegacy : JavaPlugin() {
 			TransportDebugCommand,
 			PlanetSpawnMenuCommand,
 			ShuttleCommand,
+			BuyXPCommand,
 
 			SettlementCommand,
 			NationCommand,
@@ -385,12 +392,12 @@ class StarLegacy : JavaPlugin() {
 			SiegeCommand,
 
 			AdvanceAdminCommand,
-			AdvanceCommand,
+			GiveXPCommand,
+			XPCommand,
 
 			PlanetCommand,
 			SpaceWorldCommand,
 			StarCommand,
-
 
 			BazaarCommand,
 			CityNpcCommand,
@@ -403,8 +410,9 @@ class StarLegacy : JavaPlugin() {
 			BlueprintCommand,
 			StarshipDebugCommand,
 			TutorialStartStopCommand,
-			HyperspaceBeaconCommand,
-			StarshipInfoCommand
+			StarshipInfoCommand,
+
+			Starships()
 		)
 
 	private fun registerCommands() {
@@ -452,7 +460,7 @@ class StarLegacy : JavaPlugin() {
 
 		// Add static tab completions
 		mapOf(
-			"advancements" to SLAdvancement.values().joinToString("|"),
+			"levels" to (0..MAX_LEVEL).joinToString("|"),
 			"customitems" to CustomItems.all().joinToString("|") { it.id },
 			"npctypes" to CityNPC.Type.values().joinToString("|") { it.name }
 		).forEach { manager.commandCompletions.registerStaticCompletion(it.key, it.value) }
@@ -517,13 +525,7 @@ class StarLegacy : JavaPlugin() {
 		).forEach { manager.commandCompletions.registerAsyncCompletion(it.key, it.value) }
 
 		// Register commands
-		for (command in commands) {
-			if (SETTINGS.vanilla && !command.supportsVanilla()) {
-				continue
-			}
-
-			manager.registerCommand(command)
-		}
+		for (command in commands) manager.registerCommand(command)
 	}
 
 	private fun enableRedis() {

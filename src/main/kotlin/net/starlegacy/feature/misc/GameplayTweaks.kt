@@ -117,7 +117,7 @@ object GameplayTweaks : SLComponent() {
 		require(material.isBlock)
 
 		val block = CBMagicNumbers.getBlock(material)
-		val field = BlockBehaviour::class.java.getDeclaredField("durability")
+		val field = BlockBehaviour::class.java.getDeclaredField("aH") // aH = obfuscation for explosionResistance
 		field.isAccessible = true
 		field.set(block, durability)
 
